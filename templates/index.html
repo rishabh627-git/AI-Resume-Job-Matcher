@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MatchPoint | Resume Intelligence</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="topbar"><a class="brand" href="/"><span class="logo">M</span> MatchPoint</a><span class="top-note">RESUME INTELLIGENCE</span></header>
+<main class="wrap">
+  <section class="hero"><p class="eyebrow">SMARTER SHORTLISTING</p><h1>Find the right fit,<br><em>with clarity.</em></h1><p class="sub">Compare a resume with a job description using TF-IDF and cosine similarity. Review skill coverage and keywords that may need attention.</p></section>
+  {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="alert">{{ message }}</div>{% endfor %}{% endwith %}
+  <section class="panel">
+    <form method="post" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div><label for="resume">01 / UPLOAD RESUME</label><div class="upload"><input id="resume" name="resume" type="file" accept=".pdf,.docx,.txt" required><small>PDF, DOCX or TXT · maximum 8 MB</small></div></div>
+        <div><label for="job_description">02 / JOB DESCRIPTION</label><textarea id="job_description" name="job_description" placeholder="Paste the job responsibilities, required skills and qualifications..." required>{{ job_description }}</textarea></div>
+      </div>
+      <button type="submit">Analyze compatibility <span>→</span></button>
+    </form>
+  </section>
+  {% if result %}
+  <section class="results">
+    <div class="result-head"><div><p class="eyebrow">ANALYSIS COMPLETE</p><h2>{{ result.filename }}</h2><p class="muted">{{ result.interpretation }}</p></div><div class="score"><strong>{{ result.score }}%</strong><span>TEXT SIMILARITY</span></div></div>
+    <div class="bar"><span style="width: {{ result.score }}%"></span></div>
+    <div class="columns">
+      <div class="result-card"><h3>Skills found in resume</h3><div class="chips">{% for skill in result.resume_skills %}<span>{{ skill }}</span>{% else %}<small>No listed skills detected.</small>{% endfor %}</div></div>
+      <div class="result-card"><h3>Job skills to review</h3><div class="chips">{% for skill in result.missing_skills %}<span class="missing">{{ skill }}</span>{% else %}<small>No missing skills from the built-in list.</small>{% endfor %}</div></div>
+    </div>
+    <div class="result-card"><h3>Keywords to review</h3><p class="muted">Terms present in the job description but not found in the resume text.</p><div class="chips">{% for term in result.keywords_to_review %}<span>{{ term }}</span>{% else %}<small>No additional keywords identified.</small>{% endfor %}</div></div>
+    <p class="disclaimer">This score measures textual similarity only. It is not a hiring decision, a qualification assessment, or a guarantee of job fit. Always review candidates fairly and manually.</p>
+  </section>
+  {% endif %}
+  <footer>MatchPoint · Educational project · Local processing</footer>
+</main>
+</body></html>
